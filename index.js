@@ -1,15 +1,37 @@
-document.addEventListener('DOMContentLoaded', () => {
-  d3.json(
-    'https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/video-game-sales-data.json'
-  ).then(data => {
+const dataSet = {
+  videogames: {
+    title: 'Video Game Sales',
+    description: 'Top 100 Most Sold Video Games Grouped by Platform',
+    url:
+      'https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/video-game-sales-data.json',
+  },
+
+  movies: {
+    title: 'Movie Sales',
+    description: 'Top 100 Highest Grossing Movies Grouped By Genre',
+    url:
+      'https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/movie-data.json',
+  },
+
+  kickstarter: {
+    title: 'Kickstarter Pledges',
+    description:
+      'Top 100 Most Pledged Kickstarter Campaigns Grouped By Category',
+    url:
+      'https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/kickstarter-funding-data.json',
+  },
+};
+
+function treemap(dataset) {
+  d3.json(dataSet[dataset].url).then(data => {
     d3.select('#container')
       .append('h1')
-      .text('Video Game Sales')
+      .text(dataSet[dataset].title)
       .attr('id', 'title');
 
     d3.select('#container')
       .append('h2')
-      .text('Top 100 Most Sold Video Games Grouped by Platform')
+      .text(dataSet[dataset].description)
       .attr('id', 'title');
 
     const width = 960;
@@ -56,9 +78,24 @@ document.addEventListener('DOMContentLoaded', () => {
     g.append('text')
       .attr('text-anchor', 'start')
       .attr('x', 5)
-      .attr('dy', 30)
+      .attr('dy', 15)
       .attr('font-size', '10px')
       .attr('class', 'node-label')
       .text(d => `${d.data.name}`);
   });
+}
+
+let radValue = 'videogames';
+function handleClick(myRadio) {
+  console.log(myRadio.value);
+  radValue = myRadio.value;
+  const parent = document.getElementById('container');
+  while (parent.firstChild) {
+    parent.firstChild.remove();
+  }
+  treemap(radValue);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  treemap(radValue);
 });
