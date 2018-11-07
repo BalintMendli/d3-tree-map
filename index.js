@@ -22,7 +22,7 @@ const dataSet = {
   },
 };
 
-function treemap(dataset) {
+function treemapDraw(dataset) {
   d3.json(dataSet[dataset].url).then(data => {
     d3.select('#container')
       .append('h1')
@@ -82,6 +82,46 @@ function treemap(dataset) {
       .attr('font-size', '10px')
       .attr('class', 'node-label')
       .text(d => `${d.data.name}`);
+
+    let categories = root.leaves().map(nodes => nodes.data.category);
+    categories = categories.filter(
+      (category, index, self) => self.indexOf(category) === index
+    );
+
+    const legendSvg = d3
+      .select('#container')
+      .append('svg')
+      .attr('width', 700)
+      .attr('height', 300)
+      .append('g')
+      .attr('class', 'legend')
+      .attr('transform', `translate(${30}, ${30})`);
+
+    // create g for each legend item
+    const legendItem = legendSvg
+      .selectAll('.legend-item')
+      .data(categories)
+      .enter()
+      .append('g')
+      .attr('class', 'legend-item')
+      .attr(
+        'transform',
+        (d, i) => `translate(${(i % 4) * 160},${Math.floor(i / 4) * 30})`
+      );
+
+    // legend rectangle
+    legendItem
+      .append('rect')
+      .attr('width', 20)
+      .attr('height', 20)
+      .style('fill', d => color(d));
+
+    // legend text
+    legendItem
+      .append('text')
+      .attr('x', 25)
+      .attr('y', 15)
+      .text(d => d);
   });
 }
 
@@ -93,9 +133,9 @@ function handleClick(myRadio) {
   while (parent.firstChild) {
     parent.firstChild.remove();
   }
-  treemap(radValue);
+  treemapDraw(radValue);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  treemap(radValue);
+  treemapDraw(radValue);
 });
