@@ -22,6 +22,50 @@ const dataSet = {
   },
 };
 
+function wrap(text) {
+  // eslint-disable-next-line func-names
+  text.each(function() {
+    const text = d3.select(this);
+    const width = d3.select(this).attr('width');
+
+    const words = text
+      .text()
+      .split(/\s+/)
+      .reverse();
+
+    let word;
+
+    let line = [];
+
+    const y = text.attr('y');
+
+    const dy = 10;
+
+    let tspan = text
+      .text(null)
+      .append('tspan')
+      .attr('x', 5)
+      .attr('y', y)
+      .attr('dy', `${dy + 3}px`);
+    // eslint-disable-next-line no-cond-assign
+    while ((word = words.pop())) {
+      line.push(word);
+      tspan.text(line.join(' '));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(' '));
+        line = [word];
+        tspan = text
+          .append('tspan')
+          .attr('x', 5)
+          .attr('y', y)
+          .attr('dy', `${dy}px`)
+          .text(word);
+      }
+    }
+  });
+}
+
 function treemapDraw(dataset) {
   d3.json(dataSet[dataset].url).then(data => {
     d3.select('#container')
@@ -81,7 +125,9 @@ function treemapDraw(dataset) {
       .attr('dy', 15)
       .attr('font-size', '10px')
       .attr('class', 'node-label')
-      .text(d => `${d.data.name}`);
+      .attr('width', d => d.x1 - d.x0)
+      .text(d => `${d.data.name}`)
+      .call(wrap);
 
     let categories = root.leaves().map(nodes => nodes.data.category);
     categories = categories.filter(
@@ -91,11 +137,11 @@ function treemapDraw(dataset) {
     const legendSvg = d3
       .select('#container')
       .append('svg')
-      .attr('width', 700)
+      .attr('width', 600)
       .attr('height', 300)
       .append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(${30}, ${30})`);
+      .attr('transform', `translate(30, 30)`);
 
     // create g for each legend item
     const legendItem = legendSvg
@@ -106,7 +152,7 @@ function treemapDraw(dataset) {
       .attr('class', 'legend-item')
       .attr(
         'transform',
-        (d, i) => `translate(${(i % 4) * 160},${Math.floor(i / 4) * 30})`
+        (d, i) => `translate(${(i % 3) * 200},${Math.floor(i / 3) * 30})`
       );
 
     // legend rectangle
