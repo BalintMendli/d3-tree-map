@@ -22,9 +22,8 @@ const dataSet = {
   },
 };
 
-function wrap(text) {
-  // eslint-disable-next-line func-names
-  text.each(function() {
+function wrap(textInput) {
+  textInput.each(function wrapText() {
     const text = d3.select(this);
     const width = d3.select(this).attr('width');
 
@@ -47,7 +46,7 @@ function wrap(text) {
       .attr('x', 5)
       .attr('y', y)
       .attr('dy', `${dy + 3}px`);
-    // eslint-disable-next-line no-cond-assign
+
     while ((word = words.pop())) {
       line.push(word);
       tspan.text(line.join(' '));
@@ -117,7 +116,15 @@ function treemapDraw(dataset) {
         while (d.depth > 1) d = d.parent;
         return color(d.data.name);
       })
-      .style('opacity', 0.6);
+      .style('opacity', 0.6)
+      .append('title')
+      .text(
+        d =>
+          `Name: ${d.data.name}\nCategory: ${d.data.category}\nValue: ${
+            d.data.value
+          }`
+      )
+      .attr('id', 'tooltip');
 
     g.append('text')
       .attr('text-anchor', 'start')
@@ -171,10 +178,9 @@ function treemapDraw(dataset) {
   });
 }
 
-let radValue = 'videogames';
+// eslint-disable-next-line no-unused-vars
 function handleClick(myRadio) {
-  console.log(myRadio.value);
-  radValue = myRadio.value;
+  const radValue = myRadio.value;
   const parent = document.getElementById('container');
   while (parent.firstChild) {
     parent.firstChild.remove();
@@ -183,5 +189,5 @@ function handleClick(myRadio) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  treemapDraw(radValue);
+  treemapDraw('videogames');
 });
